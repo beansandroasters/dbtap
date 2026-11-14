@@ -32,7 +32,7 @@ MD5 / SHA-1 は対応する DB 認証プロトコルの計算に使います。�
 | Python の入力・結果変換 | 4 件通過 |
 | 公開チェック / AWS 負荷スクリプト | 8 件通過 |
 | cargo-deny 0.20.2 | advisories / licenses / bans / sources すべて通過 |
-| GitHub workflow の構文 | actionlint 1.7.7 通過。GitHub 上の実行は未確認 |
+| GitHub workflow | actionlint 1.7.7 通過。CI・依存監査・Rust / Python / Actions の CodeQL 実行成功 |
 | cargo-audit | 既知脆弱性 0、警告 0 |
 | pip-audit | Locust を含む 36 パッケージ、既知脆弱性 0 |
 | cfn-lint | 東京リージョンを指定し、エラー・警告なし |
@@ -42,6 +42,18 @@ MD5 / SHA-1 は対応する DB 認証プロトコルの計算に使います。�
 | Locust の異常終了 | 途中停止で子を回収、接続不能は終了コード 1。未送信に応答時間を作らない |
 
 [監査の数値](security-validation-20261114.json)、[公開候補ファイルの検査](publication-validation-20261114.json)、[通し検証の実測](validation.ja.md)に確認範囲を記載しています。AWS 用負荷スクリプトの引数・一時ファイル・エラー伝播は偽のクライアントによるテストで確認し、実 AWS 接続は未検証です。
+
+## CodeQL の指摘
+
+[GitHub のスキャン](https://github.com/beansandroasters/dbtap/actions/runs/43576140388)は20件を検出しました。workflow の成功は解析完了を示し、指摘0件という意味ではありません。
+
+| 指摘 | 件数 | 確認結果 |
+|---|---|---|
+| 固定の暗号用値 | 16 | `#[cfg(test)]` 内の合成資格情報・nonce・RFC テストベクトル。テスト用途として除外。リリースバイナリには含まれない |
+| SHA-256 による機密データのハッシュ | 2 | SCRAM の PBKDF2 内の HMAC 鍵正規化と、MySQL `caching_sha2_password` のチャレンジ応答。パスワード保存の指摘としては誤検出 |
+| MD5 / SHA-1 の旧認証 | 2 | PostgreSQL MD5（[#4](https://github.com/beansandroasters/dbtap/security/code-scanning/4)）と MySQL native password（[#2](https://github.com/beansandroasters/dbtap/security/code-scanning/2)）の互換処理。未解決の指摘として残す |
+
+旧認証方式は接続先サーバーが選択します。PostgreSQL SCRAM-SHA-256 と MySQL `caching_sha2_password` を優先し、`--tls require` を維持してください。TLS は通信を保護しますが、サーバー側のパスワード検証方式を新しくするものではありません。dbtap に認証方式の許可リストはないため、必要なら接続先アカウント・サーバーの設定で旧認証を禁止します。CodeQL の検査項目は無効化していません。
 
 ## AWS の指摘と制約
 
