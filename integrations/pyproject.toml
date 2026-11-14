@@ -14,7 +14,7 @@ Documentation = "https://github.com/beansandroasters/dbtap/tree/main/integration
 Issues = "https://github.com/beansandroasters/dbtap/issues"
 
 [project.optional-dependencies]
-locust = ["locust==2.43.3"]
+locust = ["locust==2.47.0"]
 
 [project.scripts]
 dbtap-export = "dbtap_tools:main"
