@@ -66,6 +66,6 @@ There is no deletion protection; DB backup retention is one day, Flow Logs reten
 - Follow [SECURITY.md](../SECURITY.md) for TLS exceptions, Locust control traffic, and data handling. Shape hashes are not anonymization.
 - Deployment of the complete current AWS template, SSM/package/secret retrieval over restricted routes, and Flow Logs delivery are unverified on live infrastructure.
 - Account-wide CloudTrail/GuardDuty/Security Hub settings, host OS/container images, and Git history are outside this review.
-- Private vulnerability reporting must be enabled by the repository owner before publication; the support and license policies are defined in the root documents.
+- GitHub private vulnerability reporting, secret scanning/push protection, Dependabot alerts, and main branch protection are enabled; see [repository settings](publishing.md#github-configuration). The support and license policies are defined in the root documents. Check the linked Actions runs for each revision's CI and CodeQL results.
 
 Repeatable audit commands and release settings are in [Publication](publishing.md).
