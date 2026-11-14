@@ -54,8 +54,10 @@ Checkov は [文書化した9件](security.ja.md)で非 0 になります。抑�
 
 ## GitHub の設定
 
-所有者が **Settings → Code security → Private vulnerability reporting** を有効にし、Security → Report a vulnerability が利用できることを確認します。[報告方針](../SECURITY.ja.md)はこの窓口を使います。0.1 プレリリース中の修正対象はデフォルトブランチの最新コードだけです。
+ソースの公開先は [beansandroasters/dbtap](https://github.com/beansandroasters/dbtap)、デフォルトブランチは main です。非公開の脆弱性報告、Dependabot の通知・セキュリティ更新、secret scanning、secret scanning push protection を有効にしています。[報告方針](../SECURITY.ja.md)に従い、[非公開の報告窓口](https://github.com/beansandroasters/dbtap/security/advisories/new)を使ってください。0.1 プレリリース中の修正対象はデフォルトブランチの最新コードだけです。
 
 `.github/workflows/` にはビルド、単体・ローカル DB テスト、依存監査、Rust / Python / Actions の CodeQL を用意しています。公式 Action をコミット SHA に固定し、既定権限なし、checkout の資格情報を保持せず、pull_request_target と共有キャッシュを使いません。Dependabot は Cargo / uv / Actions を対象に7日間の cooldown を設定しています。
 
-各リビジョンの検証完了を判断する前に、[CI](https://github.com/beansandroasters/dbtap/actions/workflows/ci.yml) と [security](https://github.com/beansandroasters/dbtap/actions/workflows/security.yml) の成功を確認します。依存・セキュリティ通知と、成功したチェックによるデフォルトブランチ保護を有効にします。これらの外部設定は workflow ファイルの追加だけでは変わりません。
+[main の保護ルール](https://github.com/beansandroasters/dbtap/rules/27256329)は PR と、最新ブランチに対する test・dependencies・3種類の codeql チェック成功を必須にします。force push と削除を禁止し、直線的な履歴を要求し、迂回できる利用者は設定していません。別のレビュアーによる承認は必須にしていません。Actions の既定権限は読み取りのみで、Actions による PR 承認は無効です。
+
+各リビジョンの検証完了を判断する前に、[CI](https://github.com/beansandroasters/dbtap/actions/workflows/ci.yml) と [security](https://github.com/beansandroasters/dbtap/actions/workflows/security.yml) の成功を確認します。これらの外部設定は workflow ファイルの追加だけでは変わりません。レジストリ公開やバイナリリリースは、上記の配布物の要件を満たして別途行います。

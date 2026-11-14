@@ -66,6 +66,6 @@ MD5 / SHA-1 は対応する DB 認証プロトコルの計算に使います。�
 - TLS の例外指定、Locust 制御通信、機密データの保管条件は [SECURITY.md](../SECURITY.ja.md)に従います。samples の SQL 形状ハッシュも匿名化を保証しません。
 - AWS テンプレート全体のデプロイ、制限した経路での SSM / パッケージ / secret 取得、Flow Logs の配信は実機未検証です。静的設定だけでは動作を保証できません。
 - CloudTrail / GuardDuty / Security Hub のアカウント単位の状態、ホスト OS / Docker イメージ全体、Git 履歴はこの検査の対象外です。
-- 報告窓口・サポート方針・ライセンスをルート文書に定義し、CI 設定を用意しています。GitHub の非公開報告の有効化と初回 CI 実行は公開時に確認します。
+- GitHub の非公開報告、secret scanning / push protection、Dependabot の通知、main ブランチ保護を有効にしています。[リポジトリ設定](publishing.ja.md#github-の設定)と、各リビジョンの Actions による CI / CodeQL 結果を確認してください。報告窓口・サポート方針・ライセンスはルート文書に定義しています。
 
 再検査のコマンドと公開対象の扱いは [公開前の確認](publishing.ja.md)を参照してください。
