@@ -173,7 +173,7 @@
     "exit_code": 0,
     "shellcheck": false,
     "pyflakes": false,
-    "github_execution": false
+    "github_execution": true
   },
   "python_distribution": {
     "wheel_and_sdist_built": true,
@@ -251,6 +251,48 @@
       ],
       "matched_executions": 592,
       "expected_bulk_difference_only": true
+    }
+  },
+  "github_publication": {
+    "repository": "https://github.com/beansandroasters/dbtap",
+    "source_revision": "bdaf1daeb4efd496ef8410083416abf36b6fca1a",
+    "ci": {
+      "url": "https://github.com/beansandroasters/dbtap/actions/runs/43576140377",
+      "conclusion": "success",
+      "rust_tests_passed": 84,
+      "python_tests_passed": 12,
+      "wire_units_ran": 1450,
+      "wire_units_failed": 0,
+      "wire_units_skipped": 0,
+      "wire_business_state_and_generated_ids_match": true,
+      "pg_log_executions": 72,
+      "mysql_log_executions": 56,
+      "log_business_state_and_generated_ids_match": true
+    },
+    "security": {
+      "url": "https://github.com/beansandroasters/dbtap/actions/runs/43576140388",
+      "conclusion": "success",
+      "codeql_initial_findings": 20,
+      "dismissed_test_fixtures": 16,
+      "dismissed_protocol_false_positives": 2,
+      "open_legacy_authentication_findings": [
+        2,
+        4
+      ]
+    },
+    "install": {
+      "method": "cargo install --locked --git https://github.com/beansandroasters/dbtap --rev bdaf1da dbtap-cli",
+      "exit_code": 0,
+      "version_output": "dbtap 0.1.0",
+      "help_exit_code": 0
+    },
+    "private_vulnerability_reporting": true,
+    "secret_scanning_and_push_protection": true,
+    "dependabot_alerts_and_security_updates": true,
+    "ruleset": "https://github.com/beansandroasters/dbtap/rules/27256329",
+    "publication_metadata_sha256": {
+      "Cargo.toml": "2af3cbce2d1187d6c3f0b5b4091e39c760a4d65c9e6fb7c6877a905ac3e53463",
+      "integrations/pyproject.toml": "e7a015d32e5af359b12918fc1e3c74bc90b9a2b67e9f55d1f2cf8f4aa4c0f64a"
     }
   }
 }

@@ -32,7 +32,7 @@ MD5/SHA-1 are used for the corresponding database authentication protocols, not 
 | Python input/export tests | 4 passed |
 | Publication/AWS workload script tests | 8 passed |
 | cargo-deny 0.20.2 | Advisories, licenses, bans and sources passed |
-| GitHub workflow syntax | actionlint 1.7.7 passed; GitHub execution pending |
+| GitHub workflows | actionlint 1.7.7 passed; CI, dependency audits and Rust/Python/Actions CodeQL runs succeeded |
 | cargo-audit | 0 known vulnerabilities, 0 warnings |
 | pip-audit | 36 packages including Locust; 0 known vulnerabilities |
 | cfn-lint | No errors/warnings for ap-northeast-1 |
@@ -42,6 +42,18 @@ MD5/SHA-1 are used for the corresponding database authentication protocols, not 
 | Locust failure paths | Child reaped on interruption; unreachable targets exit 1; no invented latency for unsent requests |
 
 See [audit evidence](security-validation-20261114.json), [publication scan](publication-validation-20261114.json), and [measurements](validation.md). AWS helper arguments, temporary files, and failure propagation were tested using a fake client; real AWS/MariaDB connection behavior of the helper remains unverified.
+
+## CodeQL findings
+
+The [GitHub scan](https://github.com/beansandroasters/dbtap/actions/runs/43576140388) reported 20 findings. Workflow success means analysis completed; it does not mean zero findings.
+
+| Finding | Count | Review |
+|---|---|---|
+| Hard-coded cryptographic values | 16 | Synthetic credentials/nonces and RFC test vectors inside `#[cfg(test)]` modules; dismissed as used in tests. These modules are excluded from the release binary |
+| SHA-256 sensitive-data hashing | 2 | HMAC key normalization inside SCRAM's PBKDF2, and MySQL `caching_sha2_password` challenge-response; dismissed as false positives for password storage |
+| Legacy MD5 / SHA-1 authentication | 2 | Kept open: PostgreSQL MD5 ([#4](https://github.com/beansandroasters/dbtap/security/code-scanning/4)) and MySQL native password ([#2](https://github.com/beansandroasters/dbtap/security/code-scanning/2)) compatibility paths |
+
+The two legacy mechanisms are negotiated by the target server. Prefer PostgreSQL SCRAM-SHA-256 and MySQL `caching_sha2_password`, and retain `--tls require`. TLS protects transport but does not modernize the server's password verifier. dbtap does not offer an authentication-mechanism allowlist; configure the target account/server to disallow legacy authentication when required. No CodeQL query is disabled.
 
 ## AWS findings and limits
 
