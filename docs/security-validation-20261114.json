@@ -1,0 +1,256 @@
+{
+  "date": "2026-11-14",
+  "aws_deployed": false,
+  "rust_tests_passed": 84,
+  "python_tests_passed": 4,
+  "release_bytes": 7453272,
+  "release_sha256": "2c5a155c65636ff65de67585df40df7272ee4984f33ce8351d06b447aacbd78b",
+  "cargo_audit": {
+    "vulnerabilities": 0,
+    "warnings": {},
+    "database": {
+      "advisory-count": 1509,
+      "last-commit": "4ef2df8e806a65e2f1ecc14f56f51249062b23d6",
+      "last-updated": "2026-11-13T13:33:03+01:00"
+    }
+  },
+  "pip_audit": {
+    "dependencies": 36,
+    "vulnerabilities": 0
+  },
+  "cfn_lint": {
+    "exit_code": 0,
+    "region": "ap-northeast-1"
+  },
+  "private_configuration_assertions": {
+    "passed": true,
+    "resources": 44
+  },
+  "checkov": {
+    "summary": {
+      "passed": 76,
+      "failed": 9,
+      "skipped": 0,
+      "parsing_errors": 0,
+      "resource_count": 44,
+      "checkov_version": "3.3.17"
+    },
+    "failed_checks": [
+      {
+        "check_id": "CKV_AWS_158",
+        "check_name": "Ensure that CloudWatch Log Group is encrypted by KMS",
+        "resource": "AWS::Logs::LogGroup.FlowLogGroup",
+        "file_line_range": [
+          35,
+          38
+        ]
+      },
+      {
+        "check_id": "CKV_AWS_18",
+        "check_name": "Ensure the S3 bucket has access logging enabled",
+        "resource": "AWS::S3::Bucket.Bucket",
+        "file_line_range": [
+          201,
+          219
+        ]
+      },
+      {
+        "check_id": "CKV_AWS_21",
+        "check_name": "Ensure the S3 bucket has versioning enabled",
+        "resource": "AWS::S3::Bucket.Bucket",
+        "file_line_range": [
+          201,
+          219
+        ]
+      },
+      {
+        "check_id": "CKV_AWS_149",
+        "check_name": "Ensure that Secrets Manager secret is encrypted using KMS CMK",
+        "resource": "AWS::SecretsManager::Secret.DbSecret",
+        "file_line_range": [
+          314,
+          318
+        ]
+      },
+      {
+        "check_id": "CKV_AWS_162",
+        "check_name": "Ensure RDS cluster has IAM authentication enabled",
+        "resource": "AWS::RDS::DBCluster.Aurora",
+        "file_line_range": [
+          338,
+          352
+        ]
+      },
+      {
+        "check_id": "CKV_AWS_118",
+        "check_name": "Ensure that enhanced monitoring is enabled for Amazon RDS instances",
+        "resource": "AWS::RDS::DBInstance.AuroraInstance",
+        "file_line_range": [
+          353,
+          360
+        ]
+      },
+      {
+        "check_id": "CKV_AWS_118",
+        "check_name": "Ensure that enhanced monitoring is enabled for Amazon RDS instances",
+        "resource": "AWS::RDS::DBInstance.Mysql",
+        "file_line_range": [
+          361,
+          382
+        ]
+      },
+      {
+        "check_id": "CKV_AWS_161",
+        "check_name": "Ensure RDS database has IAM authentication enabled",
+        "resource": "AWS::RDS::DBInstance.Mysql",
+        "file_line_range": [
+          361,
+          382
+        ]
+      },
+      {
+        "check_id": "CKV_AWS_157",
+        "check_name": "Ensure that RDS instances have Multi-AZ enabled",
+        "resource": "AWS::RDS::DBInstance.Mysql",
+        "file_line_range": [
+          361,
+          382
+        ]
+      }
+    ]
+  },
+  "secret_pattern_scan": {
+    "result": "publication-validation-20261114.json",
+    "scope": "Candidate working-tree files and embedded PNG text; not all secret formats or Git history."
+  },
+  "tls": [
+    {
+      "case": "trusted",
+      "units": 1450,
+      "ran": 1450,
+      "failed": 0,
+      "unattempted": 0
+    },
+    {
+      "case": "untrusted-ca",
+      "units": 1450,
+      "ran": 0,
+      "failed": 1450,
+      "unattempted": 1450
+    },
+    {
+      "case": "wrong-hostname",
+      "units": 1450,
+      "ran": 0,
+      "failed": 1450,
+      "unattempted": 1450
+    }
+  ],
+  "inputs_sha256": {
+    "Cargo.lock": "cc32dbb5bc53e5840d2e737af817397837d71222d50e735e691b7496b0a6548b",
+    "integrations/uv.lock": "95f01b20e7ea602f58300bb55417efd4722f385413dbb788fff7d99c93199c4f",
+    "aws/verify.yaml": "bad03046343f2ba899f898b3c305d9da6af484fbedac8a700dcfeb6f8c349044",
+    "scripts/check_publication.py": "e6a68a12ed4cbd6961c87d3b7662e046311231990f8f33526ccdb3cc7f6c6f55",
+    "aws/mysql-workload.sh": "2c4367831c2881c7e42f17298c1bbed7b889887762036b4410cf7d502d5dca30",
+    "aws/lib.sh": "91435f50d06c3a9c7f506250d3a4d26887d690351c6e35fe04c23ab87ee6fc48",
+    "Cargo.toml": "20f586d571df2c678af3c462bcdfe6b1b8e6f6e8745ccf4a49fdd9ba3aff10b6",
+    "integrations/pyproject.toml": "b904f25fad5f9929b061156a882528d873d161a7efc5af2a161b4454dbc31dbb",
+    "deny.toml": "ac0473d40be841e42b714346604c37a62bb9a027c2f8201da4d56a0b47f1ee8f",
+    "e2e/up.sh": "05d7304edb59773261a04d930171c690d0e85b4d54a02fbdc0c961a49f8e71b2",
+    ".github/workflows/ci.yml": "df433b963443bd43976455bdf078d3e5dc82be7235a64bea09575b2876844555",
+    ".github/workflows/security.yml": "804b0c54f7b50e304fd8796eddf7f4f61b795f01bdc6bc6cf6b3d48ecf64960f"
+  },
+  "publication_and_shell_tests_passed": 8,
+  "cargo_deny": {
+    "version": "0.20.2",
+    "advisories": "ok",
+    "bans": "ok",
+    "licenses": "ok",
+    "sources": "ok"
+  },
+  "workflow_validation": {
+    "tool": "actionlint 1.7.7",
+    "exit_code": 0,
+    "shellcheck": false,
+    "pyflakes": false,
+    "github_execution": false
+  },
+  "python_distribution": {
+    "wheel_and_sdist_built": true,
+    "wheel_license_expression": "MIT OR Apache-2.0",
+    "both_license_texts_in_wheel": true
+  },
+  "publication_regression": {
+    "e2e": {
+      "units": 6401,
+      "ran": 6401,
+      "failed": 0,
+      "skipped": 0,
+      "verdicts": [
+        [
+          "Match",
+          6312
+        ],
+        [
+          "NonDeterministic",
+          88
+        ],
+        [
+          "Racy",
+          1
+        ]
+      ],
+      "business_state_matched": true,
+      "generated_ids_matched": false,
+      "lost_bytes": 0
+    },
+    "pg-logs": {
+      "units": 72,
+      "ran": 72,
+      "failed": 0,
+      "skipped": 0,
+      "verdicts": [
+        [
+          "Match",
+          72
+        ]
+      ],
+      "business_state_matched": true,
+      "generated_ids_matched": true,
+      "matched_executions": 72,
+      "missing": {},
+      "extra": {}
+    },
+    "my-logs": {
+      "units": 56,
+      "ran": 56,
+      "failed": 0,
+      "skipped": 0,
+      "verdicts": [
+        [
+          "Match",
+          56
+        ]
+      ],
+      "business_state_matched": true,
+      "generated_ids_matched": true,
+      "matched_executions": 56,
+      "missing": {},
+      "extra": {}
+    },
+    "pg-copy": {
+      "units": 592,
+      "ran": 586,
+      "failed": 0,
+      "skipped": 6,
+      "verdicts": [
+        [
+          "Match",
+          586
+        ]
+      ],
+      "matched_executions": 592,
+      "expected_bulk_difference_only": true
+    }
+  }
+}

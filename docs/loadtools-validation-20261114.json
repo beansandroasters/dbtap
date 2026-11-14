@@ -1,0 +1,261 @@
+{
+  "date": "2026-11-14",
+  "environment": "同一 Linux ホスト上の PostgreSQL 17 / MySQL 8.4 Docker。複数インスタンス・最大容量は未測定。",
+  "wire_replay": {
+    "units": 1450,
+    "ran": 1450,
+    "failed": 0,
+    "skipped": 0,
+    "connections": 8,
+    "verdicts": [
+      [
+        "Match",
+        1432
+      ],
+      [
+        "NonDeterministic",
+        18
+      ]
+    ],
+    "compared": {
+      "error": 1450,
+      "rows": 1450,
+      "affected": 1450,
+      "content": 1450,
+      "duration": 1450
+    },
+    "captured_seconds": 3.703715952,
+    "replayed_seconds": 4.003829137,
+    "lag": {
+      "p50_ms": 0.019712,
+      "p95_ms": 0.061952,
+      "p99_ms": 0.239616,
+      "max_ms": 0.595161,
+      "mean_ms": 0.029103933103448276
+    }
+  },
+  "locust_version": "2.43.3",
+  "locust": [
+    {
+      "workers": 1,
+      "samples": 1450,
+      "attempted": 1450,
+      "failures": 24,
+      "connections": 8,
+      "state": "  一致  PostgreSQL accounts\n  一致  PostgreSQL orders\n  一致  PostgreSQL bulk(COPY)\n  一致  PostgreSQL orders の採番 id\n  一致  MySQL accounts\n  一致  MySQL orders\n  一致  MySQL orders の採番 id\n",
+      "sample_files_sha256": [
+        "92ebb4c81b012b78256c442b3cf67b45c5c07d47fcf16a34d109e3ec3011131d"
+      ]
+    },
+    {
+      "workers": 2,
+      "samples": 1450,
+      "attempted": 1450,
+      "failures": 24,
+      "connections": 8,
+      "state": "  一致  PostgreSQL accounts\n  一致  PostgreSQL orders\n  一致  PostgreSQL bulk(COPY)\n  一致  PostgreSQL orders の採番 id\n  一致  MySQL accounts\n  一致  MySQL orders\n  一致  MySQL orders の採番 id\n",
+      "sample_files_sha256": [
+        "897cdc350ac497e5f2b5b7e23800b88874982e4b1bdb716092262d3d38675455",
+        "c258685c8557a713483eddddf9e9c9445146ce0b7badeae4a6c3bc650332f617"
+      ]
+    },
+    {
+      "interrupted_exit": 1,
+      "child_cleanup": true,
+      "partial_output_rejected": true
+    }
+  ],
+  "unreachable": {
+    "unreachable_exit": 1,
+    "unattempted": 1450,
+    "no_fabricated_latency": true
+  },
+  "jmeter": {
+    "version": "5.6.3",
+    "html_generated": true,
+    "statistics": {
+      "transaction": "Total",
+      "sampleCount": 1450,
+      "errorCount": 24,
+      "errorPct": 1.6551725,
+      "meanResTime": 0.22965517241379282,
+      "medianResTime": 0.0,
+      "minResTime": 0.0,
+      "maxResTime": 40.0,
+      "pct1ResTime": 0.0,
+      "pct2ResTime": 1.0,
+      "pct3ResTime": 4.0,
+      "throughput": 379.6805446451951,
+      "receivedKBytesPerSec": 0.0,
+      "sentKBytesPerSec": 0.0
+    },
+    "unmeasured_zero_columns": [
+      "bytes",
+      "sentBytes",
+      "grpThreads",
+      "allThreads",
+      "Latency",
+      "Connect"
+    ],
+    "note": "JTL の elapsed は整数 ms。wire_replay とは別の同規模の記録を変換。"
+  },
+  "k6": {
+    "format": "Metric/Point JSON",
+    "iteration_points": 1450,
+    "dashboard_version": "0.8.1",
+    "dashboard_iterations": 1341,
+    "dashboard_total_correct": false,
+    "limitation": "aggregate の EOF で末尾バッファが flush されない。生の JSON は全件を含む。",
+    "source": "https://raw.githubusercontent.com/grafana-cold-storage/xk6-dashboard/v0.8.1/dashboard/aggregate.go"
+  },
+  "log_regressions": {
+    "pg-security": {
+      "comparison": {
+        "wire": {
+          "units": 77,
+          "executions": 72,
+          "units_without_execution": 5
+        },
+        "logs": {
+          "units": 72,
+          "executions": 72
+        },
+        "matched_executions": 72,
+        "matched_replayable": 72,
+        "missing": {},
+        "extra": {},
+        "start_log_minus_wire": {
+          "n": 72,
+          "min_ms": -0.938022,
+          "p50_ms": -0.421671,
+          "p95_ms": 0.038248,
+          "max_ms": 0.076536,
+          "mean_ms": -0.3947445277777778
+        },
+        "end_log_minus_wire": {
+          "n": 72,
+          "min_ms": -1.054915,
+          "p50_ms": -0.543836,
+          "p95_ms": -0.129945,
+          "max_ms": -0.057163,
+          "mean_ms": -0.5568065277777777
+        }
+      },
+      "replay": {
+        "units": 72,
+        "ran": 72,
+        "failed": 0,
+        "skipped": 0,
+        "connections": 2,
+        "verdicts": [
+          [
+            "Match",
+            72
+          ]
+        ],
+        "compared": {
+          "error": 72,
+          "rows": 0,
+          "affected": 0,
+          "content": 0,
+          "duration": 72
+        },
+        "captured_seconds": 0.076088,
+        "replayed_seconds": 0.376266091,
+        "lag": {
+          "p50_ms": 0.161792,
+          "p95_ms": 4.9152,
+          "p99_ms": 5.046272,
+          "max_ms": 5.284224,
+          "mean_ms": 0.5649627916666666
+        }
+      },
+      "state": "  一致  PostgreSQL accounts\n  一致  PostgreSQL orders\n  一致  PostgreSQL bulk(COPY)\n  一致  PostgreSQL orders の採番 id\n  一致  MySQL accounts\n  一致  MySQL orders\n  一致  MySQL orders の採番 id\n"
+    },
+    "my-security": {
+      "comparison": {
+        "wire": {
+          "units": 100,
+          "sql_executions": 56,
+          "non_sql_commands": 44
+        },
+        "logs": {
+          "units": 56,
+          "sql_executions": 56
+        },
+        "matched_executions": 56,
+        "missing": {},
+        "extra": {},
+        "start_log_minus_wire": {
+          "n": 56,
+          "min_ms": 0.039311,
+          "p50_ms": 0.051633,
+          "p95_ms": 0.128123,
+          "max_ms": 0.153268,
+          "mean_ms": 0.06757885714285715
+        },
+        "end_log_minus_wire": {
+          "n": 56,
+          "min_ms": -0.047999,
+          "p50_ms": -0.019075,
+          "p95_ms": -0.01252,
+          "max_ms": -0.010584,
+          "mean_ms": -0.022635071428571428
+        }
+      },
+      "replay": {
+        "units": 56,
+        "ran": 56,
+        "failed": 0,
+        "skipped": 0,
+        "connections": 2,
+        "verdicts": [
+          [
+            "Match",
+            56
+          ]
+        ],
+        "compared": {
+          "error": 56,
+          "rows": 56,
+          "affected": 0,
+          "content": 0,
+          "duration": 56
+        },
+        "captured_seconds": 0.719283,
+        "replayed_seconds": 1.019381904,
+        "lag": {
+          "p50_ms": 0.02688,
+          "p95_ms": 0.991232,
+          "p99_ms": 1.130496,
+          "max_ms": 1.180854,
+          "mean_ms": 0.12071092857142857
+        }
+      },
+      "state": "  一致  PostgreSQL accounts\n  一致  PostgreSQL orders\n  一致  PostgreSQL bulk(COPY)\n  一致  PostgreSQL orders の採番 id\n  一致  MySQL accounts\n  一致  MySQL orders\n  一致  MySQL orders の採番 id\n"
+    }
+  },
+  "tls": [
+    {
+      "case": "trusted",
+      "units": 1450,
+      "ran": 1450,
+      "failed": 0,
+      "unattempted": 0
+    },
+    {
+      "case": "untrusted-ca",
+      "units": 1450,
+      "ran": 0,
+      "failed": 1450,
+      "unattempted": 1450
+    },
+    {
+      "case": "wrong-hostname",
+      "units": 1450,
+      "ran": 0,
+      "failed": 1450,
+      "unattempted": 1450
+    }
+  ]
+}

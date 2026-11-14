@@ -1,0 +1,454 @@
+AWSTemplateFormatVersion: "2010-09-09"
+# dbtap end-to-end tests: capture mirrored RDS/Aurora traffic and replay to clones.
+# No public IP resources, internet gateway, or NAT gateway.
+Description: dbtap end-to-end verification (RDS/Aurora traffic mirroring, capture, replay). No public IPs.
+
+Parameters:
+  S3PrefixListId:
+    Type: String
+    AllowedPattern: "pl-[0-9a-f]+"
+    Description: Regional S3 managed prefix list (obtain after sourcing aws/lib.sh)
+  PlaintextWireTest:
+    Type: String
+    Default: "false"
+    AllowedValues: ["true", "false"]
+    Description: Explicit opt-in for isolated plaintext traffic capture tests
+  AuroraVersion:
+    Type: String
+  MysqlVersion:
+    Type: String
+  AmiId:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: /aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64
+
+Conditions:
+  AllowPlaintext: !Equals [!Ref PlaintextWireTest, "true"]
+
+Resources:
+  Vpc:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.77.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags: [{Key: Name, Value: dbtap-verify}]
+  FlowLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      RetentionInDays: 7
+  FlowLogRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal: {Service: vpc-flow-logs.amazonaws.com}
+            Action: sts:AssumeRole
+            Condition:
+              StringEquals: {"aws:SourceAccount": !Ref "AWS::AccountId"}
+              ArnLike: {"aws:SourceArn": !Sub "arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:vpc-flow-log/*"}
+      Policies:
+        - PolicyName: flow-log-write
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents", "logs:DescribeLogStreams"]
+                Resource: !GetAtt FlowLogGroup.Arn
+              # DescribeLogGroups cannot be resource-scoped; do not broaden other actions.
+              - {Effect: Allow, Action: "logs:DescribeLogGroups", Resource: "*"}
+  FlowLog:
+    Type: AWS::EC2::FlowLog
+    Properties:
+      ResourceId: !Ref Vpc
+      ResourceType: VPC
+      TrafficType: ALL
+      LogDestinationType: cloud-watch-logs
+      LogGroupName: !Ref FlowLogGroup
+      DeliverLogsPermissionArn: !GetAtt FlowLogRole.Arn
+  SubnetA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref Vpc
+      CidrBlock: 10.77.1.0/24
+      AvailabilityZone: !Select [0, !GetAZs ""]
+      MapPublicIpOnLaunch: false
+  SubnetB:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref Vpc
+      CidrBlock: 10.77.2.0/24
+      AvailabilityZone: !Select [1, !GetAZs ""]
+      MapPublicIpOnLaunch: false
+  RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties: {VpcId: !Ref Vpc}
+  RtA:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties: {SubnetId: !Ref SubnetA, RouteTableId: !Ref RouteTable}
+  RtB:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties: {SubnetId: !Ref SubnetB, RouteTableId: !Ref RouteTable}
+
+  # Security groups: no inbound rules from 0.0.0.0/0.
+  ClientSg:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: dbtap verify - workload and replay host (no inbound)
+      VpcId: !Ref Vpc
+      SecurityGroupEgress:
+        - {IpProtocol: tcp, FromPort: 5432, ToPort: 5432, DestinationSecurityGroupId: !Ref DbSg, Description: PostgreSQL replay and workload}
+        - {IpProtocol: tcp, FromPort: 3306, ToPort: 3306, DestinationSecurityGroupId: !Ref DbSg, Description: MySQL replay and workload}
+        - {IpProtocol: tcp, FromPort: 443, ToPort: 443, DestinationSecurityGroupId: !Ref EndpointSg, Description: SSM and secret retrieval}
+        - {IpProtocol: tcp, FromPort: 443, ToPort: 443, DestinationPrefixListId: !Ref S3PrefixListId, Description: S3 artifacts and packages}
+  MonitorSg:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: dbtap verify - traffic mirror target
+      VpcId: !Ref Vpc
+      SecurityGroupIngress:
+        - {IpProtocol: udp, FromPort: 4789, ToPort: 4789, CidrIp: 10.77.1.0/24, Description: mirrored traffic from DB subnet A}
+        - {IpProtocol: udp, FromPort: 4789, ToPort: 4789, CidrIp: 10.77.2.0/24, Description: mirrored traffic from DB subnet B}
+      SecurityGroupEgress:
+        - {IpProtocol: tcp, FromPort: 443, ToPort: 443, DestinationSecurityGroupId: !Ref EndpointSg, Description: SSM management}
+        - {IpProtocol: tcp, FromPort: 443, ToPort: 443, DestinationPrefixListId: !Ref S3PrefixListId, Description: S3 artifacts and packages}
+  DbSg:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: dbtap verify - databases, reachable only from the client host
+      VpcId: !Ref Vpc
+      # An empty list does not remove EC2 default egress; use CDK's unreachable deny rule.
+      SecurityGroupEgress:
+        - {IpProtocol: icmp, FromPort: 252, ToPort: 86, CidrIp: 255.255.255.255/32, Description: no outbound connections}
+  DbPgIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties: {GroupId: !Ref DbSg, IpProtocol: tcp, FromPort: 5432, ToPort: 5432, SourceSecurityGroupId: !Ref ClientSg, Description: PostgreSQL from client only}
+  DbMyIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties: {GroupId: !Ref DbSg, IpProtocol: tcp, FromPort: 3306, ToPort: 3306, SourceSecurityGroupId: !Ref ClientSg, Description: MySQL from client only}
+  EndpointSg:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: dbtap verify - VPC interface endpoints
+      VpcId: !Ref Vpc
+      SecurityGroupEgress:
+        - {IpProtocol: icmp, FromPort: 252, ToPort: 86, CidrIp: 255.255.255.255/32, Description: no outbound connections}
+  EndpointClientIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties: {GroupId: !Ref EndpointSg, IpProtocol: tcp, FromPort: 443, ToPort: 443, SourceSecurityGroupId: !Ref ClientSg, Description: Management from client}
+  EndpointMonitorIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties: {GroupId: !Ref EndpointSg, IpProtocol: tcp, FromPort: 443, ToPort: 443, SourceSecurityGroupId: !Ref MonitorSg, Description: Management from monitor}
+
+  # Private endpoints for SSM and S3 artifacts/AL2023 packages.
+  S3Endpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref Vpc
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.s3
+      VpcEndpointType: Gateway
+      RouteTableIds: [!Ref RouteTable]
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal: "*"
+            Action: ["s3:GetObject", "s3:PutObject", "s3:ListBucket", "s3:GetBucketLocation"]
+            Resource: [!GetAtt Bucket.Arn, !Sub "${Bucket.Arn}/*"]
+          - Effect: Allow
+            Principal: "*"
+            Action: "s3:GetObject"
+            Resource: !Sub "arn:${AWS::Partition}:s3:::al2023-repos-${AWS::Region}-*/*"
+  SsmEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref Vpc
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.ssm
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds: [!Ref SubnetA]
+      SecurityGroupIds: [!Ref EndpointSg]
+  SsmMessagesEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref Vpc
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.ssmmessages
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds: [!Ref SubnetA]
+      SecurityGroupIds: [!Ref EndpointSg]
+  Ec2MessagesEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref Vpc
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.ec2messages
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds: [!Ref SubnetA]
+      SecurityGroupIds: [!Ref EndpointSg]
+  SecretsEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref Vpc
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.secretsmanager
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds: [!Ref SubnetA]
+      SecurityGroupIds: [!Ref EndpointSg]
+
+  # Artifact storage.
+  Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      OwnershipControls:
+        Rules: [{ObjectOwnership: BucketOwnerEnforced}]
+      LifecycleConfiguration:
+        Rules:
+          - Id: expire-test-data
+            Status: Enabled
+            ExpirationInDays: 7
+            AbortIncompleteMultipartUpload: {DaysAfterInitiation: 1}
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault: {SSEAlgorithm: AES256}
+  BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref Bucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: DenyInsecureTransport
+            Effect: Deny
+            Principal: "*"
+            Action: "s3:*"
+            Resource: [!GetAtt Bucket.Arn, !Sub "${Bucket.Arn}/*"]
+            Condition: {Bool: {"aws:SecureTransport": "false"}}
+
+  # EC2 roles trust only the EC2 service principal.
+  InstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - {Effect: Allow, Principal: {Service: ec2.amazonaws.com}, Action: "sts:AssumeRole"}
+      ManagedPolicyArns:
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/AmazonSSMManagedInstanceCore
+      Policies:
+        - PolicyName: bucket
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - {Effect: Allow, Action: ["s3:GetObject", "s3:PutObject"], Resource: !Sub "${Bucket.Arn}/*"}
+              - {Effect: Allow, Action: "s3:ListBucket", Resource: !GetAtt Bucket.Arn}
+  InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties: {Roles: [!Ref InstanceRole]}
+  ClientRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - {Effect: Allow, Principal: {Service: ec2.amazonaws.com}, Action: "sts:AssumeRole"}
+      ManagedPolicyArns:
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/AmazonSSMManagedInstanceCore
+      Policies:
+        - PolicyName: verification-resources
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - {Effect: Allow, Action: ["s3:GetObject", "s3:PutObject"], Resource: !Sub "${Bucket.Arn}/*"}
+              - {Effect: Allow, Action: "s3:ListBucket", Resource: !GetAtt Bucket.Arn}
+              - {Effect: Allow, Action: "secretsmanager:GetSecretValue", Resource: !Ref DbSecret}
+  ClientProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties: {Roles: [!Ref ClientRole]}
+  Client:
+    Type: AWS::EC2::Instance
+    DependsOn: [S3Endpoint, SsmEndpoint, SsmMessagesEndpoint, Ec2MessagesEndpoint, SecretsEndpoint]
+    Properties:
+      ImageId: !Ref AmiId
+      InstanceType: c6i.xlarge
+      SubnetId: !Ref SubnetA
+      SecurityGroupIds: [!Ref ClientSg]
+      IamInstanceProfile: !Ref ClientProfile
+      MetadataOptions: {HttpTokens: required, HttpPutResponseHopLimit: 1}
+      BlockDeviceMappings:
+        - {DeviceName: /dev/xvda, Ebs: {VolumeSize: 20, VolumeType: gp3, Encrypted: true}}
+      Tags: [{Key: Name, Value: dbtap-verify-client}]
+  # Explicit ENI for use as the mirror target.
+  MonitorEni:
+    Type: AWS::EC2::NetworkInterface
+    Properties:
+      SubnetId: !Ref SubnetA
+      GroupSet: [!Ref MonitorSg]
+      Description: dbtap verify - traffic mirror target
+  Monitor:
+    Type: AWS::EC2::Instance
+    DependsOn: [S3Endpoint, SsmEndpoint, SsmMessagesEndpoint, Ec2MessagesEndpoint]
+    Properties:
+      ImageId: !Ref AmiId
+      InstanceType: c6i.large
+      NetworkInterfaces:
+        - {NetworkInterfaceId: !Ref MonitorEni, DeviceIndex: "0"}
+      IamInstanceProfile: !Ref InstanceProfile
+      MetadataOptions: {HttpTokens: required, HttpPutResponseHopLimit: 1}
+      BlockDeviceMappings:
+        - {DeviceName: /dev/xvda, Ebs: {VolumeSize: 20, VolumeType: gp3, Encrypted: true}}
+      Tags: [{Key: Name, Value: dbtap-verify-monitor}]
+
+  # Databases: private and encrypted at rest.
+  DbSubnets:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: dbtap verify
+      SubnetIds: [!Ref SubnetA, !Ref SubnetB]
+  DbSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Description: Shared password for disposable verification databases
+      GenerateSecretString: {PasswordLength: 28, ExcludePunctuation: true}
+  AuroraParams:
+    Type: AWS::RDS::DBClusterParameterGroup
+    Properties:
+      Description: dbtap verify - TLS required unless explicitly testing plaintext capture
+      Family: !Sub
+        - aurora-postgresql${Major}
+        - Major: !Select [0, !Split [".", !Ref AuroraVersion]]
+      Parameters:
+        rds.force_ssl: !If [AllowPlaintext, "0", "1"]
+  MysqlParams:
+    Type: AWS::RDS::DBParameterGroup
+    Properties:
+      Description: dbtap verify - TLS required unless explicitly testing plaintext capture
+      Family: !Sub
+        - mysql${Major}.${Minor}
+        - Major: !Select [0, !Split [".", !Ref MysqlVersion]]
+          Minor: !Select [1, !Split [".", !Ref MysqlVersion]]
+      Parameters:
+        require_secure_transport: !If [AllowPlaintext, "0", "1"]
+  Aurora:
+    Type: AWS::RDS::DBCluster
+    DeletionPolicy: Delete
+    Properties:
+      Engine: aurora-postgresql
+      EngineVersion: !Ref AuroraVersion
+      DatabaseName: shop
+      MasterUsername: postgres
+      MasterUserPassword: !Sub "{{resolve:secretsmanager:${DbSecret}:SecretString}}"
+      DBSubnetGroupName: !Ref DbSubnets
+      VpcSecurityGroupIds: [!Ref DbSg]
+      DBClusterParameterGroupName: !Ref AuroraParams
+      StorageEncrypted: true
+      BackupRetentionPeriod: 1
+      DeletionProtection: false
+  AuroraInstance:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      Engine: aurora-postgresql
+      DBClusterIdentifier: !Ref Aurora
+      DBInstanceClass: db.r6g.large
+      PubliclyAccessible: false
+      AvailabilityZone: !Select [0, !GetAZs ""]
+  Mysql:
+    Type: AWS::RDS::DBInstance
+    DeletionPolicy: Delete
+    Properties:
+      Engine: mysql
+      EngineVersion: !Ref MysqlVersion
+      DBInstanceClass: db.m6g.large
+      AllocatedStorage: "20"
+      StorageType: gp3
+      StorageEncrypted: true
+      DBName: shop
+      MasterUsername: admin
+      MasterUserPassword: !Sub "{{resolve:secretsmanager:${DbSecret}:SecretString}}"
+      DBParameterGroupName: !Ref MysqlParams
+      DBSubnetGroupName: !Ref DbSubnets
+      VPCSecurityGroups: [!Ref DbSg]
+      PubliclyAccessible: false
+      MultiAZ: false
+      AvailabilityZone: !Select [0, !GetAZs ""]
+      BackupRetentionPeriod: 1
+      DeletionProtection: false
+      DeleteAutomatedBackups: true
+
+  # Mirror target/filter; create sessions after discovering DB ENIs.
+  MirrorTarget:
+    Type: AWS::EC2::TrafficMirrorTarget
+    # A mirror target must be an ENI attached to an instance.
+    DependsOn: Monitor
+    Properties:
+      NetworkInterfaceId: !Ref MonitorEni
+      Description: dbtap verify
+  MirrorFilter:
+    Type: AWS::EC2::TrafficMirrorFilter
+    Properties: {Description: dbtap verify - PostgreSQL and MySQL TCP inside the VPC}
+  MirrorIn:
+    Type: AWS::EC2::TrafficMirrorFilterRule
+    Properties:
+      TrafficMirrorFilterId: !Ref MirrorFilter
+      TrafficDirection: ingress
+      RuleNumber: 100
+      RuleAction: accept
+      Protocol: 6
+      SourceCidrBlock: 10.77.0.0/16
+      DestinationCidrBlock: 10.77.0.0/16
+      DestinationPortRange: {FromPort: 5432, ToPort: 5432}
+  MirrorOut:
+    Type: AWS::EC2::TrafficMirrorFilterRule
+    Properties:
+      TrafficMirrorFilterId: !Ref MirrorFilter
+      TrafficDirection: egress
+      RuleNumber: 100
+      RuleAction: accept
+      Protocol: 6
+      SourceCidrBlock: 10.77.0.0/16
+      DestinationCidrBlock: 10.77.0.0/16
+      SourcePortRange: {FromPort: 5432, ToPort: 5432}
+  MirrorMyIn:
+    Type: AWS::EC2::TrafficMirrorFilterRule
+    Properties:
+      TrafficMirrorFilterId: !Ref MirrorFilter
+      TrafficDirection: ingress
+      RuleNumber: 110
+      RuleAction: accept
+      Protocol: 6
+      SourceCidrBlock: 10.77.0.0/16
+      DestinationCidrBlock: 10.77.0.0/16
+      DestinationPortRange: {FromPort: 3306, ToPort: 3306}
+  MirrorMyOut:
+    Type: AWS::EC2::TrafficMirrorFilterRule
+    Properties:
+      TrafficMirrorFilterId: !Ref MirrorFilter
+      TrafficDirection: egress
+      RuleNumber: 110
+      RuleAction: accept
+      Protocol: 6
+      SourceCidrBlock: 10.77.0.0/16
+      DestinationCidrBlock: 10.77.0.0/16
+      SourcePortRange: {FromPort: 3306, ToPort: 3306}
+
+Outputs:
+  DbSecret: {Value: !Ref DbSecret}
+  Bucket: {Value: !Ref Bucket}
+  Client: {Value: !Ref Client}
+  Monitor: {Value: !Ref Monitor}
+  AuroraCluster: {Value: !Ref Aurora}
+  AuroraEndpoint: {Value: !GetAtt Aurora.Endpoint.Address}
+  AuroraInstance: {Value: !Ref AuroraInstance}
+  MysqlInstance: {Value: !Ref Mysql}
+  MysqlEndpoint: {Value: !GetAtt Mysql.Endpoint.Address}
+  MirrorTarget: {Value: !Ref MirrorTarget}
+  MirrorFilter: {Value: !Ref MirrorFilter}
+  DbSubnets: {Value: !Ref DbSubnets}
+  DbSg: {Value: !Ref DbSg}
+  AuroraParams: {Value: !Ref AuroraParams}

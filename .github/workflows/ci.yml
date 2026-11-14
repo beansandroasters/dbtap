@@ -1,0 +1,38 @@
+name: ci
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions: {}
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install pinned tools
+        run: |
+          rustup toolchain install 1.93.0 --profile minimal
+          rustup default 1.93.0
+          pipx install uv==0.12.17
+      - run: cargo test --workspace --locked
+      - run: cargo build --release --locked
+      - run: uv run --locked --project integrations --extra locust -m unittest discover -s integrations/tests -v
+      - run: uv run --no-project -m unittest discover -s scripts/tests -v
+      - run: uv run --no-project scripts/check_publication.py
+      - name: Real database round trip
+        run: |
+          e2e/up.sh
+          e2e/run.sh --workers 4 --ops 40
+          e2e/logs.sh --workers 2 --ops 10
+          e2e/logs.sh --mysql --workers 2 --ops 10
+      - name: Remove test databases
+        if: always()
+        run: e2e/up.sh down

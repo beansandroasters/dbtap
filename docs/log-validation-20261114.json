@@ -1,0 +1,388 @@
+{
+  "date": "2026-11-14",
+  "note": "同じ負荷の通信とログを対応づけたローカル検証。時刻差はログ−通信(ms)。ログ量は選択セッションの元ファイル上の行を数え、圧縮前。",
+  "runs": {
+    "pg_without_copy": {
+      "comparison": {
+        "wire": {
+          "units": 2742,
+          "executions": 2664,
+          "units_without_execution": 105,
+          "units_with_multiple_executions": 27
+        },
+        "logs": {
+          "units": 2664,
+          "executions": 2664
+        },
+        "matched_executions": 2664,
+        "matched_replayable": 2664,
+        "missing": {},
+        "extra": {},
+        "start_log_minus_wire": {
+          "n": 2575,
+          "min_ms": -0.956961,
+          "p50_ms": -0.365609,
+          "p95_ms": 0.145421,
+          "max_ms": 2.72973,
+          "mean_ms": -0.35325377708737865
+        },
+        "end_log_minus_wire": {
+          "n": 2575,
+          "min_ms": -5.172758,
+          "p50_ms": -0.586396,
+          "p95_ms": -0.11285,
+          "max_ms": -0.053295,
+          "mean_ms": -0.5799974706796116
+        }
+      },
+      "import": {
+        "csv_rows": 9703,
+        "selected_rows": 4296,
+        "sessions": 6,
+        "units": 2664,
+        "parse": 533,
+        "bind": 1093,
+        "errors": 35,
+        "skipped": {},
+        "ignored": 0
+      },
+      "report": {
+        "units": 2664,
+        "ran": 2664,
+        "skipped": 0,
+        "failed": 0,
+        "verdicts": [
+          [
+            "Match",
+            2664
+          ]
+        ],
+        "compared": {
+          "error": 2664,
+          "rows": 0,
+          "affected": 0,
+          "content": 0,
+          "duration": 2629
+        },
+        "order_violations": 0,
+        "lock_inversions": 0,
+        "captured_seconds": 1.026086,
+        "replayed_seconds": 1.326170456,
+        "connections": 6,
+        "latency_captured": {
+          "p50_ms": 0.021248,
+          "p95_ms": 0.991232,
+          "p99_ms": 1.327104,
+          "max_ms": 3.503,
+          "mean_ms": 0.12160251046025104
+        },
+        "latency_replayed": {
+          "p50_ms": 0.223232,
+          "p95_ms": 1.163264,
+          "p99_ms": 1.654784,
+          "max_ms": 3.79803,
+          "mean_ms": 0.32790601331304675
+        },
+        "lag": {
+          "p50_ms": 0.078848,
+          "p95_ms": 0.663552,
+          "p99_ms": 1.949696,
+          "max_ms": 10.583924,
+          "mean_ms": 0.25455973723723724
+        }
+      },
+      "selected_log_bytes": 1237721,
+      "selected_log_bytes_per_execution": 464.609984984985,
+      "wire_journal_bytes": 56302,
+      "log_journal_bytes": 63385,
+      "capture": "記録を開始しました(live:lo)。Ctrl-C で止めます\nパケット 5805 / 接続 6(うち途中から 0) / 257897 バイト / 欠落 0 バイト / 再送 0 / 順序入れ替わり 0\n",
+      "state": "  一致  PostgreSQL accounts\n  一致  PostgreSQL orders\n  一致  PostgreSQL bulk(COPY)\n  (参考) 相違  PostgreSQL orders の採番 id\n  一致  MySQL accounts\n  一致  MySQL orders\n  一致  MySQL orders の採番 id\n"
+    },
+    "pg_with_copy": {
+      "comparison": {
+        "wire": {
+          "units": 2741,
+          "executions": 2664,
+          "units_without_execution": 104,
+          "units_with_multiple_executions": 27
+        },
+        "logs": {
+          "units": 2664,
+          "executions": 2664,
+          "skipped": 21
+        },
+        "matched_executions": 2664,
+        "matched_replayable": 2643,
+        "missing": {},
+        "extra": {},
+        "start_log_minus_wire": {
+          "n": 2575,
+          "min_ms": -0.954155,
+          "p50_ms": -0.427489,
+          "p95_ms": 0.030624,
+          "max_ms": 1.070165,
+          "mean_ms": -0.42067691533980583
+        },
+        "end_log_minus_wire": {
+          "n": 2575,
+          "min_ms": -1.077864,
+          "p50_ms": -0.559773,
+          "p95_ms": -0.111132,
+          "max_ms": -0.037377,
+          "mean_ms": -0.5557632038834951
+        }
+      },
+      "import": {
+        "csv_rows": 5122,
+        "selected_rows": 4294,
+        "sessions": 6,
+        "units": 2664,
+        "parse": 532,
+        "bind": 1092,
+        "errors": 35,
+        "skipped": {
+          "LogDataMissing": 21
+        },
+        "ignored": 0
+      },
+      "report": {
+        "units": 2664,
+        "ran": 2643,
+        "skipped": 21,
+        "failed": 0,
+        "verdicts": [
+          [
+            "Match",
+            2643
+          ]
+        ],
+        "compared": {
+          "error": 2643,
+          "rows": 0,
+          "affected": 0,
+          "content": 0,
+          "duration": 2608
+        },
+        "order_violations": 0,
+        "lock_inversions": 0,
+        "captured_seconds": 0.965072,
+        "replayed_seconds": 1.265153602,
+        "connections": 6,
+        "latency_captured": {
+          "p50_ms": 0.016,
+          "p95_ms": 0.974848,
+          "p99_ms": 1.458176,
+          "max_ms": 1.906,
+          "mean_ms": 0.12020782208588957
+        },
+        "latency_replayed": {
+          "p50_ms": 0.17408,
+          "p95_ms": 1.097728,
+          "p99_ms": 1.55648,
+          "max_ms": 2.123391,
+          "mean_ms": 0.2681821023773006
+        },
+        "lag": {
+          "p50_ms": 0.157696,
+          "p95_ms": 0.548864,
+          "p99_ms": 1.130496,
+          "max_ms": 8.144514,
+          "mean_ms": 0.22851624782444194
+        }
+      },
+      "selected_log_bytes": 1232855,
+      "selected_log_bytes_per_execution": 462.78340840840843,
+      "wire_journal_bytes": 57679,
+      "log_journal_bytes": 62176,
+      "capture": "記録を開始しました(live:lo)。Ctrl-C で止めます\nパケット 5875 / 接続 6(うち途中から 0) / 263311 バイト / 欠落 0 バイト / 再送 0 / 順序入れ替わり 0\n",
+      "state": "  一致  PostgreSQL accounts\n  一致  PostgreSQL orders\n  相違  PostgreSQL bulk(COPY) (d938dad5b839 / d41d8cd98f00)\n  (参考) 相違  PostgreSQL orders の採番 id\n  一致  MySQL accounts\n  一致  MySQL orders\n  一致  MySQL orders の採番 id\n",
+      "wire_copy_commands": 21,
+      "wire_copy_affected_rows": 420
+    },
+    "mysql": {
+      "comparison": {
+        "wire": {
+          "units": 3660,
+          "sql_executions": 1942,
+          "non_sql_commands": 1718
+        },
+        "logs": {
+          "units": 1942,
+          "sql_executions": 1942
+        },
+        "matched_executions": 1942,
+        "missing": {},
+        "extra": {},
+        "start_log_minus_wire": {
+          "n": 1942,
+          "min_ms": 0.031565,
+          "p50_ms": 0.065828,
+          "p95_ms": 2.768371,
+          "max_ms": 14.720323,
+          "mean_ms": 0.49923191452111226
+        },
+        "end_log_minus_wire": {
+          "n": 1942,
+          "min_ms": -10.002552,
+          "p50_ms": -0.022052,
+          "p95_ms": 0.03222,
+          "max_ms": 0.853488,
+          "mean_ms": -0.15011351184346036
+        }
+      },
+      "import": {
+        "entries": 4169,
+        "selected_entries": 3658,
+        "units": 1942,
+        "errors": 57,
+        "administrative": {
+          "Close stmt": 547,
+          "Ping": 3,
+          "Prepare": 550,
+          "Quit": 6,
+          "Reset stmt": 610
+        },
+        "skipped": 0
+      },
+      "report": {
+        "units": 1942,
+        "ran": 1942,
+        "skipped": 0,
+        "failed": 0,
+        "verdicts": [
+          [
+            "Match",
+            1942
+          ]
+        ],
+        "compared": {
+          "error": 1942,
+          "rows": 1942,
+          "affected": 0,
+          "content": 0,
+          "duration": 1942
+        },
+        "order_violations": 0,
+        "lock_inversions": 0,
+        "captured_seconds": 11.550411,
+        "replayed_seconds": 11.850552854,
+        "connections": 6,
+        "latency_captured": {
+          "p50_ms": 0.169984,
+          "p95_ms": 5.177344,
+          "p99_ms": 19.6608,
+          "max_ms": 124.613,
+          "mean_ms": 1.4278233779608651
+        },
+        "latency_replayed": {
+          "p50_ms": 0.479232,
+          "p95_ms": 6.356992,
+          "p99_ms": 14.548992,
+          "max_ms": 123.18164,
+          "mean_ms": 1.8193490314109164
+        },
+        "lag": {
+          "p50_ms": 0.056832,
+          "p95_ms": 11.665408,
+          "p99_ms": 29.622272,
+          "max_ms": 40.609672,
+          "mean_ms": 1.9461120324407828
+        }
+      },
+      "selected_log_bytes": 2113852,
+      "selected_log_bytes_per_execution": 1088.4922760041195,
+      "wire_journal_bytes": 74178,
+      "log_journal_bytes": 63880,
+      "capture": "記録を開始しました(live:lo)。Ctrl-C で止めます\nパケット 7959 / 接続 6(うち途中から 0) / 299474 バイト / 欠落 0 バイト / 再送 0 / 順序入れ替わり 0\n",
+      "state": "  一致  PostgreSQL accounts\n  一致  PostgreSQL orders\n  一致  PostgreSQL bulk(COPY)\n  一致  PostgreSQL orders の採番 id\n  一致  MySQL accounts\n  一致  MySQL orders\n  (参考) 相違  MySQL orders の採番 id\n"
+    }
+  },
+  "probe": {
+    "mysql_before": "10.0",
+    "pg_before": "-1",
+    "mysql_old_after": "10.0",
+    "mysql_new_after": "0.0",
+    "pg_old_after": "0",
+    "success_errno": 0,
+    "syntax_errno": 1064,
+    "duplicate_errno": 1062,
+    "success_logged": true,
+    "syntax_logged": false,
+    "duplicate_logged": true
+  },
+  "versions": {
+    "postgres": "postgres (PostgreSQL) 17.12 (Debian 17.12-1.pgdg13+1)",
+    "mysql": "mysql  Ver 8.4.13 for Linux on x86_64 (MySQL Community Server - GPL)",
+    "cpus": "8"
+  },
+  "logging_benchmark": {
+    "seconds": 30,
+    "clients": 16,
+    "scale": 10,
+    "warmup_seconds": 30,
+    "results": [
+      {
+        "pair": 0,
+        "logging": "off",
+        "tps": 3414.112318,
+        "transactions": 102390,
+        "log_bytes": 0,
+        "bytes_per_transaction": 0.0
+      },
+      {
+        "pair": 0,
+        "logging": "on",
+        "tps": 3587.463796,
+        "transactions": 107628,
+        "log_bytes": 448460654,
+        "bytes_per_transaction": 4166.765655777307
+      },
+      {
+        "pair": 1,
+        "logging": "off",
+        "tps": 3242.044427,
+        "transactions": 97220,
+        "log_bytes": 0,
+        "bytes_per_transaction": 0.0
+      },
+      {
+        "pair": 1,
+        "logging": "on",
+        "tps": 3191.255056,
+        "transactions": 95659,
+        "log_bytes": 399475757,
+        "bytes_per_transaction": 4176.0394421852625
+      },
+      {
+        "pair": 2,
+        "logging": "off",
+        "tps": 3625.707877,
+        "transactions": 108744,
+        "log_bytes": 0,
+        "bytes_per_transaction": 0.0
+      },
+      {
+        "pair": 2,
+        "logging": "on",
+        "tps": 3221.226692,
+        "transactions": 96626,
+        "log_bytes": 404059695,
+        "bytes_per_transaction": 4181.68707180262
+      }
+    ],
+    "mean_tps": {
+      "off": 3427.288207333333,
+      "on": 3333.3151813333334
+    },
+    "change_percent": -2.7419061460581706,
+    "note": "30秒ウォームアップ後、OFF/ONを30秒ずつ3組。DBと負荷が同一8vCPUホスト。測定中に別の負荷テストやビルドを実行せず、完了した6回を集計。他プロセスを統制した専有ホストの測定ではない。",
+    "raw_outputs": {
+      "2-on.txt": "pgbench (17.12 (Debian 17.12-1.pgdg13+1))\ntransaction type: <builtin: TPC-B (sort of)>\nscaling factor: 10\nquery mode: prepared\nnumber of clients: 16\nnumber of threads: 8\nmaximum number of tries: 1\nduration: 30 s\nnumber of transactions actually processed: 96626\nnumber of failed transactions: 0 (0.000%)\nlatency average = 4.967 ms\ninitial connection time = 25.293 ms\ntps = 3221.226692 (without initial connection time)\n",
+      "2-off.txt": "pgbench (17.12 (Debian 17.12-1.pgdg13+1))\ntransaction type: <builtin: TPC-B (sort of)>\nscaling factor: 10\nquery mode: prepared\nnumber of clients: 16\nnumber of threads: 8\nmaximum number of tries: 1\nduration: 30 s\nnumber of transactions actually processed: 108744\nnumber of failed transactions: 0 (0.000%)\nlatency average = 4.413 ms\ninitial connection time = 24.307 ms\ntps = 3625.707877 (without initial connection time)\n",
+      "1-on.txt": "pgbench (17.12 (Debian 17.12-1.pgdg13+1))\ntransaction type: <builtin: TPC-B (sort of)>\nscaling factor: 10\nquery mode: prepared\nnumber of clients: 16\nnumber of threads: 8\nmaximum number of tries: 1\nduration: 30 s\nnumber of transactions actually processed: 95659\nnumber of failed transactions: 0 (0.000%)\nlatency average = 5.014 ms\ninitial connection time = 42.345 ms\ntps = 3191.255056 (without initial connection time)\n",
+      "1-off.txt": "pgbench (17.12 (Debian 17.12-1.pgdg13+1))\ntransaction type: <builtin: TPC-B (sort of)>\nscaling factor: 10\nquery mode: prepared\nnumber of clients: 16\nnumber of threads: 8\nmaximum number of tries: 1\nduration: 30 s\nnumber of transactions actually processed: 97220\nnumber of failed transactions: 0 (0.000%)\nlatency average = 4.935 ms\ninitial connection time = 40.249 ms\ntps = 3242.044427 (without initial connection time)\n",
+      "0-on.txt": "pgbench (17.12 (Debian 17.12-1.pgdg13+1))\ntransaction type: <builtin: TPC-B (sort of)>\nscaling factor: 10\nquery mode: prepared\nnumber of clients: 16\nnumber of threads: 8\nmaximum number of tries: 1\nduration: 30 s\nnumber of transactions actually processed: 107628\nnumber of failed transactions: 0 (0.000%)\nlatency average = 4.460 ms\ninitial connection time = 23.383 ms\ntps = 3587.463796 (without initial connection time)\n",
+      "0-off.txt": "pgbench (17.12 (Debian 17.12-1.pgdg13+1))\ntransaction type: <builtin: TPC-B (sort of)>\nscaling factor: 10\nquery mode: prepared\nnumber of clients: 16\nnumber of threads: 8\nmaximum number of tries: 1\nduration: 30 s\nnumber of transactions actually processed: 102390\nnumber of failed transactions: 0 (0.000%)\nlatency average = 4.686 ms\ninitial connection time = 23.473 ms\ntps = 3414.112318 (without initial connection time)\n"
+    }
+  }
+}

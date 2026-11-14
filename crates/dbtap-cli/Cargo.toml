@@ -1,0 +1,25 @@
+[package]
+name = "dbtap-cli"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Record and replay PostgreSQL and MySQL workloads on their original timeline"
+
+[dependencies]
+dbtap-core.workspace = true
+dbtap-proto.workspace = true
+dbtap-capture.workspace = true
+dbtap-logs.workspace = true
+dbtap-replay.workspace = true
+anyhow.workspace = true
+clap.workspace = true
+libc.workspace = true
+rustls.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+
+[[bin]]
+name = "dbtap"
+path = "src/main.rs"

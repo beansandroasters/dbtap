@@ -1,0 +1,359 @@
+{
+  "date": "2026-11-14",
+  "region": "ap-northeast-1",
+  "note": "デフォルトパラメータ定義への読み取りのみ。インスタンスの作成・設定変更・ログ取得は行っていない。",
+  "families": {
+    "postgres17": [
+      {
+        "ParameterName": "log_connections",
+        "AllowedValues": "0,1",
+        "ApplyType": "dynamic",
+        "IsModifiable": true
+      },
+      {
+        "ParameterName": "log_destination",
+        "ParameterValue": "stderr",
+        "AllowedValues": "stderr,csvlog,jsonlog",
+        "ApplyType": "dynamic",
+        "IsModifiable": true
+      },
+      {
+        "ParameterName": "log_disconnections",
+        "AllowedValues": "0,1",
+        "ApplyType": "dynamic",
+        "IsModifiable": true
+      },
+      {
+        "ParameterName": "log_min_duration_statement",
+        "AllowedValues": "-1-2147483647",
+        "ApplyType": "dynamic",
+        "IsModifiable": true
+      },
+      {
+        "ParameterName": "log_parameter_max_length",
+        "AllowedValues": "-1-1073741823",
+        "ApplyType": "dynamic",
+        "IsModifiable": true
+      },
+      {
+        "ParameterName": "log_parameter_max_length_on_error",
+        "AllowedValues": "-1-1073741823",
+        "ApplyType": "dynamic",
+        "IsModifiable": true
+      },
+      {
+        "ParameterName": "log_statement",
+        "AllowedValues": "none,ddl,mod,all",
+        "ApplyType": "dynamic",
+        "IsModifiable": true
+      },
+      {
+        "ParameterName": "log_timezone",
+        "ParameterValue": "UTC",
+        "ApplyType": "dynamic",
+        "IsModifiable": false
+      }
+    ],
+    "aurora-postgresql17": {
+      "api": "DescribeEngineDefaultParameters",
+      "parameters": [
+        {
+          "name": "log_connections",
+          "modifiable": true,
+          "type": "dynamic",
+          "allowed": "0,1"
+        },
+        {
+          "name": "log_destination",
+          "modifiable": true,
+          "type": "dynamic",
+          "allowed": "stderr,csvlog"
+        },
+        {
+          "name": "log_directory",
+          "modifiable": false,
+          "type": "dynamic",
+          "allowed": null
+        },
+        {
+          "name": "log_disconnections",
+          "modifiable": true,
+          "type": "dynamic",
+          "allowed": "0,1"
+        },
+        {
+          "name": "log_duration",
+          "modifiable": true,
+          "type": "dynamic",
+          "allowed": "0,1"
+        },
+        {
+          "name": "log_error_verbosity",
+          "modifiable": true,
+          "type": "dynamic",
+          "allowed": "terse,default,verbose"
+        },
+        {
+          "name": "log_executor_stats",
+          "modifiable": true,
+          "type": "dynamic",
+          "allowed": "0,1"
+        },
+        {
+          "name": "log_file_mode",
+          "modifiable": false,
+          "type": "dynamic",
+          "allowed": null
+        },
+        {
+          "name": "log_filename",
+          "modifiable": false,
+          "type": "dynamic",
+          "allowed": "postgresql.log.%Y-%m-%d,postgresql.log.%Y-%m-%d-%H,postgresql.log.%Y-%m-%d-%H%M"
+        },
+        {
+          "name": "log_hostname",
+          "modifiable": true,
+          "type": "dynamic",
+          "allowed": "0,1"
+        },
+        {
+          "name": "log_line_prefix",
+          "modifiable": true,
+          "type": "dynamic",
+          "allowed": "%t:%r:%u@%d:[%p]:,%m:%r:%u@%d:[%p]:%l:%e:%s:%v:%x:%c:%q%a:"
+        },
+        {
+          "name": "log_lock_waits",
+          "modifiable": true,
+          "type": "dynamic",
+          "allowed": "0,1"
+        },
+        {
+          "name": "log_min_duration_sample",
+          "modifiable": true,
+          "type": "dynamic",
+          "allowed": "-1-2147483647"
+        },
+        {
+          "name": "log_min_duration_statement",
+          "modifiable": true,
+          "type": "dynamic",
+          "allowed": "-1-2147483647"
+        },
+        {
+          "name": "log_min_error_statement",
+          "modifiable": true,
+          "type": "dynamic",
+          "allowed": "debug5,debug4,debug3,debug2,debug1,info,notice,warning,error,log,fatal,panic"
+        },
+        {
+          "name": "log_min_messages",
+          "modifiable": true,
+          "type": "dynamic",
+          "allowed": "debug5,debug4,debug3,debug2,debug1,info,notice,warning,error,log,fatal"
+        },
+        {
+          "name": "log_parameter_max_length",
+          "modifiable": true,
+          "type": "dynamic",
+          "allowed": "-1-1073741823"
+        },
+        {
+          "name": "log_parameter_max_length_on_error",
+          "modifiable": true,
+          "type": "dynamic",
+          "allowed": "-1-1073741823"
+        },
+        {
+          "name": "log_parser_stats",
+          "modifiable": true,
+          "type": "dynamic",
+          "allowed": "0,1"
+        },
+        {
+          "name": "log_planner_stats",
+          "modifiable": true,
+          "type": "dynamic",
+          "allowed": "0,1"
+        },
+        {
+          "name": "log_replication_commands",
+          "modifiable": true,
+          "type": "dynamic",
+          "allowed": "0,1"
+        },
+        {
+          "name": "log_rotation_age",
+          "modifiable": true,
+          "type": "dynamic",
+          "allowed": "10-1440"
+        },
+        {
+          "name": "log_rotation_size",
+          "modifiable": true,
+          "type": "dynamic",
+          "allowed": "50000-1000000"
+        },
+        {
+          "name": "log_startup_progress_interval",
+          "modifiable": true,
+          "type": "dynamic",
+          "allowed": "0-2147483647"
+        },
+        {
+          "name": "log_statement",
+          "modifiable": true,
+          "type": "dynamic",
+          "allowed": "none,ddl,mod,all"
+        },
+        {
+          "name": "log_statement_sample_rate",
+          "modifiable": true,
+          "type": "dynamic",
+          "allowed": "0-1"
+        },
+        {
+          "name": "log_statement_stats",
+          "modifiable": true,
+          "type": "dynamic",
+          "allowed": "0,1"
+        },
+        {
+          "name": "log_temp_files",
+          "modifiable": true,
+          "type": "dynamic",
+          "allowed": "-1-2147483647"
+        },
+        {
+          "name": "log_timezone",
+          "modifiable": false,
+          "type": "dynamic",
+          "allowed": null
+        },
+        {
+          "name": "log_truncate_on_rotation",
+          "modifiable": false,
+          "type": "dynamic",
+          "allowed": "0,1"
+        }
+      ]
+    },
+    "mysql8.4": [
+      {
+        "ParameterName": "log_output",
+        "AllowedValues": "TABLE,FILE,NONE",
+        "ApplyType": "dynamic",
+        "IsModifiable": true
+      },
+      {
+        "ParameterName": "log_slow_extra",
+        "AllowedValues": "ON,OFF",
+        "ApplyType": "dynamic",
+        "IsModifiable": true
+      },
+      {
+        "ParameterName": "long_query_time",
+        "AllowedValues": "0-31536000",
+        "ApplyType": "dynamic",
+        "IsModifiable": true
+      },
+      {
+        "ParameterName": "min_examined_row_limit",
+        "AllowedValues": "0-18446744073709547520",
+        "ApplyType": "dynamic",
+        "IsModifiable": true
+      },
+      {
+        "ParameterName": "slow_query_log",
+        "AllowedValues": "0,1",
+        "ApplyType": "dynamic",
+        "IsModifiable": true
+      }
+    ],
+    "aurora-mysql8.0": {
+      "api": "DescribeEngineDefaultParameters",
+      "parameters": [
+        {
+          "ParameterName": "log_output",
+          "ParameterValue": "FILE",
+          "Description": "Controls where to store query logs",
+          "Source": "system",
+          "ApplyType": "dynamic",
+          "DataType": "string",
+          "AllowedValues": "TABLE,FILE,NONE",
+          "IsModifiable": true
+        },
+        {
+          "ParameterName": "log_slow_extra",
+          "Description": "When the slow query log is enabled and the output destination as FILE, additional information related to the slow query is written to the slow query log file. TABLE output is unaffected",
+          "Source": "engine-default",
+          "ApplyType": "dynamic",
+          "DataType": "boolean",
+          "AllowedValues": "0,1",
+          "IsModifiable": true
+        },
+        {
+          "ParameterName": "long_query_time",
+          "Description": "Defines what MySQL considers long queries",
+          "Source": "engine-default",
+          "ApplyType": "dynamic",
+          "DataType": "float",
+          "AllowedValues": "0-31536000",
+          "IsModifiable": true
+        },
+        {
+          "ParameterName": "slow_query_log",
+          "Description": "Enable or disable the slow query log",
+          "Source": "engine-default",
+          "ApplyType": "dynamic",
+          "DataType": "boolean",
+          "AllowedValues": "0,1",
+          "IsModifiable": true
+        }
+      ]
+    },
+    "aurora-mysql8.4": {
+      "api": "DescribeEngineDefaultParameters",
+      "parameters": [
+        {
+          "ParameterName": "log_output",
+          "ParameterValue": "FILE",
+          "Description": "Controls where to store query logs",
+          "Source": "system",
+          "ApplyType": "dynamic",
+          "DataType": "string",
+          "AllowedValues": "TABLE,FILE,NONE",
+          "IsModifiable": true
+        },
+        {
+          "ParameterName": "log_slow_extra",
+          "Description": "When the slow query log is enabled and the output destination as FILE, additional information related to the slow query is written to the slow query log file. TABLE output is unaffected",
+          "Source": "engine-default",
+          "ApplyType": "dynamic",
+          "DataType": "boolean",
+          "AllowedValues": "0,1",
+          "IsModifiable": true
+        },
+        {
+          "ParameterName": "long_query_time",
+          "Description": "Defines what MySQL considers long queries",
+          "Source": "engine-default",
+          "ApplyType": "dynamic",
+          "DataType": "float",
+          "AllowedValues": "0-31536000",
+          "IsModifiable": true
+        },
+        {
+          "ParameterName": "slow_query_log",
+          "Description": "Enable or disable the slow query log",
+          "Source": "engine-default",
+          "ApplyType": "dynamic",
+          "DataType": "boolean",
+          "AllowedValues": "0,1",
+          "IsModifiable": true
+        }
+      ]
+    }
+  }
+}
