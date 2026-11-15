@@ -10,13 +10,13 @@
 |---|---|
 | ビルド・単体テスト | Linux x86_64、Rust 1.93.0。Rust 84 件、Python 結果変換 4 件、公開・スクリプト検査 8 件 |
 | 通信の記録と再生 | 同一ホストの PG / MySQL、1,450 単位。実行失敗・skip 0、最終状態・採番 ID 一致 |
-| Locust 2.43.3 | 同一ホストの単独 / 2 ワーカー各 1,450 件。最終 CSV と実測の件数一致、最終状態一致 |
+| Locust 2.47.0 | 同一ホストの単独 / 2 ワーカー各 1,450 件。最終 CSV と実測の件数一致、最終状態・採番 ID 一致 |
 | JMeter 5.6.3 | 1,450 件の JTL から HTML 生成。DB エラー 24 件 |
 | k6 JSON | 1,450 件を出力。k6-web-dashboard v0.8.1 の HTML は末尾欠落で 1,341 件となる制約あり |
 | TLS | PG / MySQL の両方で正しい CA・ホスト名なら実行。未登録 CA / ホスト名不一致では SQL 送信前に拒否 |
 | ログ経路の回帰確認 | PG 72 / MySQL 56 実行が通信と対応し、最終状態一致 |
 
-[検証の数値](loadtools-validation-20261114.json)、[セキュリティ検査](security.ja.md)、[再現手順](../e2e/README.ja.md)。複数インスタンスでの Locust 実行、負荷生成側の最大容量、RDS / Aurora の実ログからの通し再生は未検証です。
+[Locust 2.47.0 の確認値](locust-validation-20261115.json)、[JMeter / k6 と以前の測定](loadtools-validation-20261114.json)、[セキュリティ検査](security.ja.md)、[再現手順](../e2e/README.ja.md)。複数インスタンスでの Locust 実行、負荷生成側の最大容量、RDS / Aurora の実ログからの通し再生は未検証です。
 
 
 公開候補の通し確認では、通信6,401単位を実行し、欠落・実行失敗・skip は0、業務データは一致しました。採番 ID は参考比較で差がありました。PG ログ72件・MySQLログ56件は通信との対応と最終状態が一致しています。[確認値](security-validation-20261114.json)の `publication_regression` を参照してください。

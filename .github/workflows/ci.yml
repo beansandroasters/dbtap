@@ -27,10 +27,12 @@ jobs:
       - run: uv run --locked --project integrations --extra locust -m unittest discover -s integrations/tests -v
       - run: uv run --no-project -m unittest discover -s scripts/tests -v
       - run: uv run --no-project scripts/check_publication.py
-      - name: Real database round trip
+      - name: Database and Locust round trips
         run: |
           e2e/up.sh
-          e2e/run.sh --workers 4 --ops 40
+          WORK="$RUNNER_TEMP/dbtap-wire" e2e/run.sh --workers 4 --ops 40
+          uv run --locked --project integrations --extra locust e2e/loadtools.py \
+            "$RUNNER_TEMP/dbtap-wire/cap.dbtap" "$RUNNER_TEMP/dbtap-locust"
           e2e/logs.sh --workers 2 --ops 10
           e2e/logs.sh --mysql --workers 2 --ops 10
       - name: Remove test databases

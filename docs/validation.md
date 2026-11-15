@@ -10,13 +10,13 @@ These are measurements under the stated conditions, not maximum-capacity or comp
 |---|---|
 | Build/unit tests | Linux x86_64, Rust 1.93.0; 84 Rust, 4 Python export, 8 publication/script tests |
 | Wire capture/replay | PG/MySQL on one host, 1,450 units, no execution failures/skips, final data and IDs matched |
-| Locust 2.43.3 | Local and two workers on one host, 1,450 each; final CSV counts and data matched |
+| Locust 2.47.0 | Local and two workers on one host, 1,450 each; final CSV counts, data and generated IDs matched |
 | JMeter 5.6.3 | HTML generated from 1,450 JTL samples; 24 DB errors |
 | k6 JSON | 1,450 exported; k6-web-dashboard v0.8.1 HTML has EOF loss and reports 1,341 |
 | TLS | Both engines accept trusted CA/hostname and reject untrusted CA/wrong hostname before SQL |
 | Log regression | 72 PG / 56 MySQL executions matched traffic and final data |
 
-[Evidence](loadtools-validation-20261114.json), [security review](security.md), [reproduction](../e2e/README.md). Multi-instance Locust, maximum generator capacity, and actual RDS/Aurora log replay are unvalidated.
+[Locust 2.47.0 evidence](locust-validation-20261115.json), [JMeter/k6 and earlier measurements](loadtools-validation-20261114.json), [security review](security.md), [reproduction](../e2e/README.md). Multi-instance Locust, maximum generator capacity, and actual RDS/Aurora log replay are unvalidated.
 
 
 The publication-candidate round trip replayed 6,401 wire units with zero capture loss, failures, or skips and matching business data. Generated IDs differed in reference checks. PG log 72 / MySQL log 56 executions matched traffic and final state. See `publication_regression` in the [evidence](security-validation-20261114.json).
