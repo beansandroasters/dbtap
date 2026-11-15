@@ -10,7 +10,7 @@ Replay preserves changes in request frequency, SQL mix, recorded connection timi
 
 | Tool | Support |
 |---|---|
-| Locust 2.43.3 | Execution, fixed sharding, request completion events and statistics |
+| Locust 2.47.0 | Execution, fixed sharding, request completion events and statistics |
 | Apache JMeter 5.6.3 | JTL CSV export; HTML with `jmeter -g` |
 | k6 | Metric/Point JSON output, not k6 scripts or native k6 execution |
 | pgbench / sysbench | Their DB traffic/logs can be recorded through existing inputs; no dedicated plugin. sysbench execution is unvalidated |
@@ -107,6 +107,6 @@ WORK=/tmp/dbtap/tools-capture e2e/run.sh --workers 4 --ops 40
 uv run --project integrations --extra locust e2e/loadtools.py /tmp/dbtap/tools-capture/cap.dbtap /tmp/dbtap/tools-test
 ```
 
-On 2026-11-14, local and two-worker runs on one host each produced 1,450 events and 24 DB errors matching the final CSV; final data and generated IDs matched too. Interruption reaped the child and exited 1. An unreachable target left all 1,450 units unsent, without invented 0 ms samples. See [evidence](../docs/loadtools-validation-20261114.json). Multi-instance execution and maximum capacity are unmeasured.
+With Locust 2.47.0 on 2026-11-15, local and two-worker runs on one host each produced 1,450 events and 24 expected DB errors matching the final CSV; final data and generated IDs matched too. Interruption reaped the child and exited 1. An unreachable target left all 1,450 units unsent, without invented 0 ms samples. See [Locust evidence](../docs/locust-validation-20261115.json) and the [JMeter/k6 measurements](../docs/loadtools-validation-20261114.json). CI runs the same Locust checks. Multi-instance execution and maximum capacity are unmeasured.
 
 References: [Locust custom protocols](https://docs.locust.io/en/stable/testing-other-systems.html), [JMeter results](https://jmeter.apache.org/usermanual/listeners.html), [k6 JSON](https://grafana.com/docs/k6/latest/results-output/real-time/json/).

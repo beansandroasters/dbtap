@@ -10,7 +10,7 @@
 
 | ツール | 対応範囲 |
 |---|---|
-| Locust 2.43.3 | 実行・固定ワーカーへの分割・完了時の request イベント・集計 |
+| Locust 2.47.0 | 実行・固定ワーカーへの分割・完了時の request イベント・集計 |
 | Apache JMeter 5.6.3 | JTL CSV の出力。`jmeter -g` で HTML レポートを生成 |
 | k6 | Metric/Point JSON 形式の結果出力。k6 スクリプトへの変換や k6 本体からの再生ではない |
 | pgbench / sysbench | 発生させた DB 負荷を既存の通信/ログ取り込みで記録できる。専用プラグインは不要。sysbench 自体の実行は未検証 |
@@ -105,7 +105,7 @@ WORK=/tmp/dbtap/tools-capture e2e/run.sh --workers 4 --ops 40
 uv run --project integrations --extra locust e2e/loadtools.py /tmp/dbtap/tools-capture/cap.dbtap /tmp/dbtap/tools-test
 ```
 
-2026-11-14 の実測では、単独と同一ホストの 2 ワーカーで各 1,450 件・DB エラー 24 件が最終 CSV と一致し、再生後のテーブルと採番 ID も一致した。途中停止は子プロセスを回収して終了コード 1、接続不能は 1,450 件すべてを未送信として扱い、架空の 0 ms の標本を足さないことも確認した。[検証結果](../docs/loadtools-validation-20261114.json)を参照。複数インスタンスでの実行と容量の上限は未測定。
+2026-11-15 に Locust 2.47.0 で実測したところ、単独と同一ホストの 2 ワーカーで各 1,450 件・想定した DB エラー 24 件が最終 CSV と一致し、再生後のテーブルと採番 ID も一致した。途中停止は子プロセスを回収して終了コード 1、接続不能は 1,450 件すべてを未送信として扱い、架空の 0 ms の標本を足さないことも確認した。[Locust の検証結果](../docs/locust-validation-20261115.json)、[JMeter / k6 の測定](../docs/loadtools-validation-20261114.json)を参照。CI でも同じ Locust 検査を実行する。複数インスタンスでの実行と容量の上限は未測定。
 
 参照: [Locust custom protocols](https://docs.locust.io/en/stable/testing-other-systems.html)、
 [JMeter result formats](https://jmeter.apache.org/usermanual/listeners.html)、

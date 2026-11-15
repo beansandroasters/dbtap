@@ -1,0 +1,92 @@
+{
+  "date": "2026-11-15",
+  "platform": "Linux x86_64",
+  "python_version": "3.14.0",
+  "locust_version": "2.47.0",
+  "source_revision": "acbf7fcde4e30b8a12604be297758fcf81dc760e",
+  "workload": {
+    "workers": 4,
+    "operations_per_worker": 40,
+    "source_connections": 8,
+    "same_host": true
+  },
+  "wire": {
+    "ran": 1450,
+    "failed": 0,
+    "skipped": 0,
+    "verdicts": [
+      [
+        "Match",
+        1432
+      ],
+      [
+        "NonDeterministic",
+        18
+      ]
+    ]
+  },
+  "locust_runs": [
+    {
+      "workers": 1,
+      "samples": 1450,
+      "attempted": 1450,
+      "db_errors": 24,
+      "connections": 8,
+      "statuses": {
+        "ran": 1450
+      },
+      "comparisons": {
+        "Match": 1432,
+        "NonDeterministic": 18
+      },
+      "final_csv_request_and_error_counts_match": true,
+      "connection_shards_disjoint": true,
+      "business_state_and_generated_ids_match": true
+    },
+    {
+      "workers": 2,
+      "samples": 1450,
+      "attempted": 1450,
+      "db_errors": 24,
+      "connections": 8,
+      "statuses": {
+        "ran": 1450
+      },
+      "comparisons": {
+        "Match": 1432,
+        "NonDeterministic": 18
+      },
+      "final_csv_request_and_error_counts_match": true,
+      "connection_shards_disjoint": true,
+      "business_state_and_generated_ids_match": true
+    }
+  ],
+  "interruption": {
+    "interrupted_exit": 1,
+    "child_cleanup": true,
+    "partial_output_rejected": true
+  },
+  "unreachable": {
+    "unreachable_exit": 1,
+    "unattempted": 1450
+  },
+  "python_export_tests_passed": 4,
+  "pip_audit": {
+    "version": "2.9.0",
+    "dependencies": 36,
+    "known_vulnerabilities": 0
+  },
+  "upstream_review": {
+    "release": "https://github.com/locustio/locust/releases/tag/2.47.0",
+    "breaking_change": "/stop and /stats/reset are POST-only; dbtap does not call these web endpoints.",
+    "adapter_interfaces": "Event hooks, custom worker messages, WorkerRunner._send_stats and StatsCSV were reviewed and exercised by the local/two-worker tests."
+  },
+  "inputs_sha256": {
+    "integrations/pyproject.toml": "49dad73144fe0aa827099919f44a6ec34b8e009a0536ab1d5ecb3dde5099c519",
+    "integrations/uv.lock": "59485c2baa868578d6372f4b37e56e5e8ad5d1594ad0a2156825bfdabf2ccec1",
+    "integrations/dbtap_tools/locust_adapter.py": "ab849b67d0a01163c73898407ece1f62c1174172a905f5a80271d8466a4ae2ae",
+    "e2e/loadtools.py": "69a5b8c995afe723397225ebaaf5a54a9c92bcd32027ee329c23e07799a4c052",
+    "e2e/workload.py": "d244d457be5e96f936399d8da9c85a3819c4f31524962ae45dcf86c772cadc1b"
+  },
+  "scope": "Synthetic local Docker workload; not a multi-instance or capacity benchmark. Raw journals, paths, SQL and logs are excluded."
+}
